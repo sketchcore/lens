@@ -18,17 +18,27 @@ app.use(bodyParser.json());
 
 // Webhook endpoint
 app.post('/webhook', async (req, res) => {
-  const { content } = req.body;
-  
-  if (content.includes('joined the game')) {
-    const player = content.split(' ')[0];
-    await bot.sendMessage(chatId, `LENS Alert: Player ${player} has joined the Minecraft server!`);
-  } else if (content.includes('left the game')) {
-    const player = content.split(' ')[0];
-    await bot.sendMessage(chatId, `LENS Alert: Player ${player} has left the Minecraft server.`);
-  }
+  try {
+    const { content } = req.body;
+    console.log('Received webhook:', content);
+    
+    if (content.includes('joined the game')) {
+      const player = content.split(' ')[0];
+      await bot.sendMessage(chatId, `LENS Alert: Player ${player} has joined the Minecraft server!`);
+      console.log(`Sent join message for ${player}`);
+    } else if (content.includes('left the game')) {
+      const player = content.split(' ')[0];
+      await bot.sendMessage(chatId, `LENS Alert: Player ${player} has left the Minecraft server.`);
+      console.log(`Sent leave message for ${player}`);
+    } else {
+      console.log('Unhandled content:', content);
+    }
 
-  res.sendStatus(200);
+    res.sendStatus(200);
+  } catch (error) {
+    console.error('Error processing webhook:', error);
+    res.sendStatus(500);
+  }
 });
 
 // Start the Express server
