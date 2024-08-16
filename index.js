@@ -38,9 +38,18 @@ discordClient.on('messageCreate', async (message) => {
   if (message.content.includes('joined the game')) {
     const player = message.content.split(' joined')[0];
     
-    // Send message only to the group chat
+    // Log the chat ID being used
     console.log('Sending notification to chat ID:', telegramChatId);
-    await telegramBot.sendMessage(telegramChatId, `LENS Alert: ${player} has joined the Minecraft server!`);
+    
+    await telegramBot.sendMessage(telegramChatId, `LENS Alert: ${player} has joined the Minecraft server!`)
+      .then(() => {
+        console.log(`Sent join message for ${player}`);
+      })
+      .catch((error) => {
+        console.error('Error sending join message:', error);
+      });
+  } else {
+    console.log('Message does not contain "joined the game".');
   }
 });
 
@@ -58,10 +67,16 @@ app.post('/webhook', async (req, res) => {
 
     if (content && content.includes('joined the game')) {
       const player = content.split(' joined')[0];
-      await telegramBot.sendMessage(telegramChatId, `LENS Alert: ${player} has joined the Minecraft server!`);
-      console.log(`Sent join message for ${player}`);
+      console.log('Sending notification to chat ID from webhook:', telegramChatId);
+      await telegramBot.sendMessage(telegramChatId, `LENS Alert: ${player} has joined the Minecraft server!`)
+        .then(() => {
+          console.log(`Sent join message for ${player} from webhook`);
+        })
+        .catch((error) => {
+          console.error('Error sending join message from webhook:', error);
+        });
     } else {
-      console.log('Unhandled content:', content);
+      console.log('Unhandled content in webhook:', content);
     }
 
     res.sendStatus(200);
@@ -96,5 +111,5 @@ telegramBot.sendMessage(telegramChatId, 'Test message to group chat!')
     console.log('Test message sent to group chat!');
   })
   .catch((error) => {
-    console.error('Error sending message:', error);
+    console.error('Error sending test message:', error);
   });
