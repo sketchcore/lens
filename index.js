@@ -38,6 +38,7 @@ discordClient.on('messageCreate', async (message) => {
     const player = message.content.split(' joined')[0];
     
     // Send message only to the group chat
+    console.log('Sending notification to chat ID:', telegramChatId);
     await telegramBot.sendMessage(telegramChatId, `LENS Alert: ${player} has joined the Minecraft server!`);
   }
 });
