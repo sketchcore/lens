@@ -32,10 +32,19 @@ app.use((req, res, next) => {
 // Discord bot event handler
 discordClient.on('messageCreate', async (message) => {
   console.log('Received Discord message:', message.content);
+  
+  // Check if the message is from a specific channel or user
   if (message.content.includes('joined the game')) {
     const player = message.content.split(' joined')[0];
+    
+    // Send message only to the group chat
     await telegramBot.sendMessage(telegramChatId, `LENS Alert: ${player} has joined the Minecraft server!`);
   }
+});
+
+// Add a separate handler for Telegram messages if needed
+telegramBot.on('message', (msg) => {
+  // Handle Telegram messages if necessary
 });
 
 // Webhook endpoint
@@ -78,12 +87,8 @@ discordClient.login(discordToken).then(() => {
   console.error('Error logging in to Discord:', error);
 });
 
-// Keep the Replit app alive
-setInterval(() => {
-  http.get(`http://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`);
-}, 280000);
-
 // Test sending a message to the group chat
+console.log('Sending test message to chat ID:', telegramChatId);
 telegramBot.sendMessage(telegramChatId, 'Test message to group chat!')
   .then(() => {
     console.log('Test message sent to group chat!');
