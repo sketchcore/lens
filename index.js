@@ -1,35 +1,53 @@
 require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
+const { Client, Intents } = require('discord.js');
 const express = require('express');
 const bodyParser = require('body-parser');
+const http = require('http');
 
-// Telegram Bot Token
-const token = process.env.TELEGRAM_BOT_TOKEN;
+// Telegram Bot Token and Chat ID
+const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
+const telegramChatId = process.env.TELEGRAM_CHAT_ID;
 
-// Telegram Group Chat ID
-const chatId = process.env.TELEGRAM_CHAT_ID;
+// Discord Bot Token
+const discordToken = process.env.DISCORD_BOT_TOKEN;
 
-// Create a bot instance
-const bot = new TelegramBot(token, { polling: true });
+// Create bot instances
+const telegramBot = new TelegramBot(telegramToken, { polling: true });
+const discordClient = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 
 // Create an Express app to listen for webhook events
 const app = express();
 app.use(bodyParser.json());
 
+// Log all incoming requests
+app.use((req, res, next) => {
+  console.log(`Received ${req.method} request to ${req.url}`);
+  console.log('Headers:', JSON.stringify(req.headers));
+  console.log('Body:', JSON.stringify(req.body));
+  next();
+});
+
+// Discord bot event handler
+discordClient.on('messageCreate', async (message) => {
+  console.log('Received Discord message:', message.content);
+  if (message.content.includes('joined the game')) {
+    const player = message.content.split(' joined')[0];
+    await telegramBot.sendMessage(telegramChatId, `LENS Alert: ${player} has joined the Minecraft server!`);
+  }
+});
+
 // Webhook endpoint
 app.post('/webhook', async (req, res) => {
+  console.log('Received webhook. Request body:', JSON.stringify(req.body));
   try {
     const { content } = req.body;
-    console.log('Received webhook:', content);
-    
-    if (content.includes('joined the game')) {
-      const player = content.split(' ')[0];
-      await bot.sendMessage(chatId, `LENS Alert: Player ${player} has joined the Minecraft server!`);
+    console.log('Extracted content:', content);
+
+    if (content && content.includes('joined the game')) {
+      const player = content.split(' joined')[0];
+      await telegramBot.sendMessage(telegramChatId, `LENS Alert: ${player} has joined the Minecraft server!`);
       console.log(`Sent join message for ${player}`);
-    } else if (content.includes('left the game')) {
-      const player = content.split(' ')[0];
-      await bot.sendMessage(chatId, `LENS Alert: Player ${player} has left the Minecraft server.`);
-      console.log(`Sent leave message for ${player}`);
     } else {
       console.log('Unhandled content:', content);
     }
@@ -41,8 +59,25 @@ app.post('/webhook', async (req, res) => {
   }
 });
 
+// Root route
+app.get('/', (req, res) => {
+  res.send('LENS bot is running!');
+});
+
 // Start the Express server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`LENS (Legion Engagement and Notification System) is running on port ${PORT}`);
 });
+
+// Login Discord bot
+discordClient.login(discordToken).then(() => {
+  console.log('Discord bot is ready!');
+}).catch(error => {
+  console.error('Error logging in to Discord:', error);
+});
+
+// Keep the Replit app alive
+setInterval(() => {
+  http.get(`http://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`);
+}, 280000);
