@@ -8,6 +8,7 @@ const http = require('http');
 // Telegram Bot Token and Chat ID
 const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
 const telegramChatId = process.env.TELEGRAM_CHAT_ID;
+console.log('Telegram Chat ID:', telegramChatId);
 
 // Discord Bot Token
 const discordToken = process.env.DISCORD_BOT_TOKEN;
@@ -81,3 +82,12 @@ discordClient.login(discordToken).then(() => {
 setInterval(() => {
   http.get(`http://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`);
 }, 280000);
+
+// Test sending a message to the group chat
+telegramBot.sendMessage(telegramChatId, 'Test message to group chat!')
+  .then(() => {
+    console.log('Test message sent to group chat!');
+  })
+  .catch((error) => {
+    console.error('Error sending message:', error);
+  });
