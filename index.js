@@ -7,7 +7,8 @@ const http = require('http');
 
 // Telegram Bot Token and Chat ID
 const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
-const telegramChatId = process.env.TELEGRAM_CHAT_ID;
+// Hardcoded Telegram Chat ID
+const telegramChatId = '-1001234567890'; // Replace with your actual group chat ID
 console.log('Telegram Chat ID:', telegramChatId);
 
 // Discord Bot Token
