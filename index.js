@@ -5,13 +5,13 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 // Telegram Bot Token and Chat ID
-const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
+const telegramToken = '7299665026:AAG6-gmQbOJyfNtM3FDyW0SsGcpdJkrGMME';
 // Hardcoded Telegram Chat ID
 const telegramChatId = '-1001365987500';
 console.log('Telegram Chat ID:', telegramChatId);
 
 // Discord Bot Token from environment variable
-const discordToken = process.env.DISCORD_BOT_TOKEN; // This will be set in Vercel
+const discordToken = 'MTI3Mzg4MjMxMzY5NjIxNTEwNQ.Gz6PyF.SutciU6cYpwsIwHazbcG4wvS2D4AMHVSkF1KIc'; // This will be set in Vercel
 
 // Log the Discord token for debugging purposes
 console.log('Discord token:', discordToken);
