@@ -4,16 +4,15 @@ const { Client, Intents } = require('discord.js');
 const express = require('express');
 const bodyParser = require('body-parser');
 
-// Telegram Bot Token and Chat ID
-const telegramToken = '7299665026:AAG6-gmQbOJyfNtM3FDyW0SsGcpdJkrGMME';
-// Hardcoded Telegram Chat ID
-const telegramChatId = '-1001365987500';
+// Telegram Bot Token and Chat ID from environment variables
+const telegramToken = process.env.TELEGRAM_BOT_TOKEN; // This will be set in Vercel
+const telegramChatId = process.env.TELEGRAM_CHAT_ID; // This should also be set in Vercel
 console.log('Telegram Chat ID:', telegramChatId);
 
 // Discord Bot Token from environment variable
-const discordToken = 'MTI3Mzg4MjMxMzY5NjIxNTEwNQ.Gz6PyF.SutciU6cYpwsIwHazbcG4wvS2D4AMHVSkF1KIc'; // This will be set in Vercel
+const discordToken = process.env.DISCORD_BOT_TOKEN; // This will be set in Vercel
 
-// Log the Discord token for debugging purposes
+// Log the Discord token for debugging purposes (remove in production)
 console.log('Discord token:', discordToken);
 
 // Create bot instances
@@ -56,55 +55,17 @@ discordClient.on('messageCreate', async (message) => {
   }
 });
 
-// Add a separate handler for Telegram messages if needed
-telegramBot.on('message', (msg) => {
-  // Handle Telegram messages if necessary
-});
-
-// Webhook endpoint
-app.post('/webhook', async (req, res) => {
-  console.log('Received webhook. Request body:', JSON.stringify(req.body));
-  try {
-    const { content } = req.body;
-    console.log('Extracted content:', content);
-
-    if (content && content.includes('joined the game')) {
-      const player = content.split(' joined')[0];
-      console.log('Sending notification to chat ID from webhook:', telegramChatId);
-      await telegramBot.sendMessage(telegramChatId, `LENS Alert: ${player} has joined the Minecraft server!`)
-        .then(() => {
-          console.log(`Sent join message for ${player} from webhook`);
-        })
-        .catch((error) => {
-          console.error('Error sending join message from webhook:', error);
-        });
-    } else {
-      console.log('Unhandled content in webhook:', content);
-    }
-
-    res.sendStatus(200);
-  } catch (error) {
-    console.error('Error processing webhook:', error);
-    res.sendStatus(500);
-  }
-});
-
-// Root route
-app.get('/', (req, res) => {
-  res.send('LENS bot is running!');
+// Start the Discord bot
+discordClient.login(discordToken).then(() => {
+  console.log('Discord bot is ready!');
+}).catch(error => {
+  console.error('Error logging in to Discord:', error);
 });
 
 // Start the Express server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`LENS (Legion Engagement and Notification System) is running on port ${PORT}`);
-});
-
-// Login Discord bot
-discordClient.login(discordToken).then(() => {
-  console.log('Discord bot is ready!');
-}).catch(error => {
-  console.error('Error logging in to Discord:', error);
 });
 
 // Test sending a message to the group chat
