@@ -8,7 +8,7 @@ const http = require('http');
 // Telegram Bot Token and Chat ID
 const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
 // Hardcoded Telegram Chat ID
-const telegramChatId = '-1001234567890'; // Replace with your actual group chat ID
+const telegramChatId = '-1001365987500'; // Replace with your actual group chat ID
 console.log('Telegram Chat ID:', telegramChatId);
 
 // Discord Bot Token
@@ -32,10 +32,12 @@ app.use((req, res, next) => {
 
 // Discord bot event handler
 discordClient.on('messageCreate', async (message) => {
-  console.log('Received Discord message:', message.content);
+  console.log('Received Discord message:', JSON.stringify(message)); // Log the entire message object
+  console.log('Message content:', message.content); // Log the message content
   
   // Check if the message is from a specific channel or user
   if (message.content.includes('joined the game')) {
+    console.log('Condition met for sending notification.');
     const player = message.content.split(' joined')[0];
     
     // Log the chat ID being used
@@ -49,7 +51,7 @@ discordClient.on('messageCreate', async (message) => {
         console.error('Error sending join message:', error);
       });
   } else {
-    console.log('Message does not contain "joined the game".');
+    console.log('Condition not met for sending notification.');
   }
 });
 
