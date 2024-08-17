@@ -3,16 +3,18 @@ const TelegramBot = require('node-telegram-bot-api');
 const { Client, Intents } = require('discord.js');
 const express = require('express');
 const bodyParser = require('body-parser');
-const http = require('http');
 
 // Telegram Bot Token and Chat ID
 const telegramToken = process.env.TELEGRAM_BOT_TOKEN;
 // Hardcoded Telegram Chat ID
-const telegramChatId = '-1001365987500'; // Replace with your actual group chat ID
+const telegramChatId = '-1001365987500';
 console.log('Telegram Chat ID:', telegramChatId);
 
-// Discord Bot Token
-const discordToken = process.env.DISCORD_BOT_TOKEN;
+// Discord Bot Token from environment variable
+const discordToken = process.env.DISCORD_BOT_TOKEN; // This will be set in Vercel
+
+// Log the Discord token for debugging purposes
+console.log('Discord token:', discordToken);
 
 // Create bot instances
 const telegramBot = new TelegramBot(telegramToken, { polling: true });
@@ -32,8 +34,7 @@ app.use((req, res, next) => {
 
 // Discord bot event handler
 discordClient.on('messageCreate', async (message) => {
-  console.log('Received Discord message:', JSON.stringify(message)); // Log the entire message object
-  console.log('Message content:', message.content); // Log the message content
+  console.log('Received Discord message:', JSON.stringify(message));
   
   // Check if the message is from a specific channel or user
   if (message.content.includes('joined the game')) {
